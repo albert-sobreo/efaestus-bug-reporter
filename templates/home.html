@@ -1,0 +1,356 @@
+{% extends "base-template.html" %}
+{% block title %}Bug Reporter{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <div class="container">
+        <div class="c-nav d-flex mb-3 mt-2 font-bold justify-content-between">
+            <!-- LOGO -->
+            <div class="c-nav-item justify-content-start">
+                <img src="/static/media/Union.svg" height="24"><span class="pl-1 font-size-18">Efaestus Bug Reporter</span>
+            </div>
+
+            <div>
+                <!-- TABS -->
+                <div class="imps-nav justify-content-end font-semibold navbar">
+                    <a href="">Link</a>
+                </div>
+
+                <!-- LOGOUT -->
+                <div class="c-nav-item justify-content-end align-items-center">
+                    <a href="/logout/" style="text-decoration: none;"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div>
+            <div class="modal fade" id="modal">
+                <div class="modal-dialog">
+                    <div class="modal-content b-radius-15">
+                        <div class="modal-body">
+                            <div class="mb-4">
+                                <span class="modal-title">Report Bug</span>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <form action="/record-bug/" method="POST">{% csrf_token %}
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Bug #</label>
+                                            <input name="bugCode" type="text" class="form-control" value="{{bugCode}}">
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div class="row">
+                                    <div class="col pr-2">
+                                        <div class="form-group">
+                                            <label for="">Main Feature</label>
+                                            <select v-model="mainFeature" name="mainFeature" class="form-control">
+                                                <option value="" selected disabled>Choose Main Feature</option>
+                                                <option v-for="item in mainFeatures" :value="[[item]]">[[item]]</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col pl-2">
+                                        <div class="form-group">
+                                            <label for="">Sub Feature</label>
+                                            <select name="subFeature" class="form-control" v-if="mainFeature == 'IMPS'">
+                                                <option value="" selected disabled>Choose IMPS Feature</option>
+                                                <option v-for="item in subFeatures.IMPS" :value="[[item]]">[[item]]</option>
+                                            </select>
+                                            <select name="subFeature" class="form-control" v-else-if="mainFeature == 'GAS'">
+                                                <option value="" selected disabled>Choose GAS Feature</option>
+                                                <option v-for="item in subFeatures.GAS" :value="[[item]]">[[item]]</option>
+                                            </select>
+                                            <select name="subFeature" class="form-control" v-else-if="mainFeature == 'EMS'">
+                                                <option value="" selected disabled>Choose EMS Feature</option>
+                                            </select>
+                                            <select v-else name="subFeature" class="form-control">
+                                                <option value="" selected disabled>Choose Sub Feature</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Bug Title</label>
+                                            <input name="bugTitle" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Description</label>
+                                            <textarea name="description" class="form-control" cols="30" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Project Folder</label>
+                                            <input name="projectFolder" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Steps to Reproduce</label>
+                                            <textarea name="steps" cols="30" rows="4" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Expected Results</label>
+                                            <textarea name="expected" cols="30" rows="2" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Priority</label>
+                                            <select name="priority" class="form-control">
+                                                <option value="" selected disabled>Choose Priority Level</option>
+                                                <option value="1" class="text-success">! Low</option>
+                                                <option value="2" class="text-warning">!! Medium</option>
+                                                <option value="3" class="text-danger">!!! High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="">Date Found</label>
+                                            <input name="dateFound" type="date" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-primary col">Submit</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THE TABLE -->
+            <div>
+                <div class="my-3">
+                    <span class="font-bold">Bugs</span>
+                </div>
+                
+
+
+                <div class="modal fade" id="viewModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content b-radius-15">
+                            <div class="modal-body">
+                                <!-- TOP CARD -->
+                                <div class="order-card row my-2">
+                                    <div class="col-6 mt-3">
+                                        <label class="gray" for="">[[modal.bugCode]]</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">[[modal.bugTitle]]</span>
+                                    </div>
+                                    <div class="col-6 mt-3">
+                                        <label class="gray" for="">[[modal.mainFeature]]</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">[[modal.subFeature]]</span>
+                                    </div>
+                                    <div class="col-6 my-3">
+                                        <label for="" class="gray">Priority</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold text-success" v-if="modal.priority == 1">Low</span>
+                                        <span class="font-size-14 font-bold text-warning" v-if="modal.priority == 2">Medium</span>
+                                        <span class="font-size-14 font-bold text-danger" v-if="modal.priority == 3">High</span>
+                                    </div>
+                                    <div class="col-6 my-3">
+                                        <label for="" class="gray">Status</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold text-warning" v-if='modal.status=="Unresolved"'>Unresolved</span>
+                                        <span class="font-size-14 font-bold text-success" v-if='modal.status=="Unresolved"'>Resolved</span>
+                                        <span class="font-size-14 font-bold text-info" v-else>Unknown</span>
+                                    </div>
+                                </div>
+
+                                <!-- NEXT -->
+                                <div class="order-card row my-2">
+                                    <div class="col-12 my-3">
+                                        <label for="" class="gray">Description</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">[[modal.description]]</span>
+                                    </div>
+                                </div>
+
+                                <!-- NEXT -->
+                                <div class="order-card row my-2">
+                                    <div class="col-12 my-3">
+                                        <label for="" class="gray">Steps to Reproduce</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">[[modal.steps]]</span>
+                                    </div>
+                                </div>
+
+                                <!-- NEXT -->
+                                <div class="order-card row my-2">
+                                    <div class="col-12 my-3">
+                                        <label for="" class="gray">Expected Results</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">[[modal.expected]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bug-table py-3" style="position: relative;">
+                    <button data-toggle="modal" data-target="#modal" class="btn b-radius-circle box-shadow-off btn-warning py-1 px-1 font-size-18 add-bug-btn">+</button>
+                    
+                    {% for bug in bugs %}
+                    <div @click="fetchBug({{bug.pk}})" data-toggle="modal" data-target="#viewModal" class="bug-table-row-container pl-1 pr-2 py-3">
+                        <div class="bug-table-row-content">
+                            <div class="row">
+                                <div class="col-1">
+                                    <div class="d-flex align-items-center justify-content-end h-100">
+                                        <span class="font-bold font-size-10" style="color:rgb(34, 219, 34)">●</span>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col-3 font-bold">{{bug.bugCode}}</div>
+                                        <div class="col-3 font-bold">Date Found</div>
+                                        <div class="col-3 font-bold">{{bug.subFeature}}</div>
+                                        <div class="col-3 font-bold">Discovered By</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-3 font-semibold gray">
+                                            {% if bug.priority == 1 %}
+                                            <span class="text-success">!</span>
+                                            {% elif bug.priority == 2 %}
+                                            <span class="text-warning">!!</span>
+                                            {% else %}
+                                            <span class="text-danger">!!!</span>
+                                            {% endif %}
+                                            
+                                            {{bug.bugTitle}}
+                                            
+                                        </div>
+                                        <div class="col-3 font-semibold gray">{{bug.dateFound}}</div>
+                                        <div class="col-3 font-semibold gray">{{bug.mainFeature}}</div>
+                                        <div class="col-3 font-semibold gray">{{bug.discoveredBy}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- END TABLE -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            mainFeature: '',
+
+            modal: {
+                bugCode: '',
+                mainFeature: '',
+                subFeature: '',
+                bugTitle: null,
+                description: null,
+                projectFolder: null,
+                steps: null,
+                expected: null,
+                priority: 1, 
+                dateFound: null,
+            },
+
+            mainFeatures: [
+                'IMPS',
+                'GAS',
+                'EMS'
+            ],
+
+            subFeatures: {
+                IMPS: [
+                    'Merchandise Inventory',
+                    'Other Invenotry',
+                    'Job Order',
+                    'Transfer',
+                    'Adjustments',
+                    'Deliveries',
+                    'Warehouse',
+                    'Reports',
+                    'Approvals'
+                ],
+
+                GAS: [
+                    'Journal',
+                    'Quotations',
+                    'Sales Order',
+                    'Sales Contract',
+                    'Exports',
+                    'DR/LS',
+                    'Received Payments',
+                    'Purchase Request',
+                    'Purchase Order',
+                    'Receiving Report',
+                    'Inward Inventory',
+                    'Completion Report',
+                    'Payment Voucher',
+                    'Reports',
+                    'Customers',
+                    'Vendors',
+                    'Bank Reconciliation',
+                    'Chart of Accounts',
+                    'PPE',
+                    'Approvals'
+                ]
+            }
+        },
+
+        methods: {
+            fetchBug(id){
+                axios.get(`/api/bug/${id}/`)
+                .then(res=>this.modal=res.data)
+            }
+        }
+    })
+</script>
+
+{% endblock %}
