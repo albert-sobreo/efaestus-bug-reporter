@@ -185,7 +185,7 @@
                                         <label for="" class="gray">Status</label>
                                         <br>
                                         <span class="font-size-14 font-bold text-warning" v-if='modal.status=="Unresolved"'>Unresolved</span>
-                                        <span class="font-size-14 font-bold text-success" v-if='modal.status=="Unresolved"'>Resolved</span>
+                                        <span class="font-size-14 font-bold text-success" v-else-if='modal.status=="Resolved"'>Resolved</span>
                                         <span class="font-size-14 font-bold text-info" v-else>Unknown</span>
                                     </div>
                                 </div>
@@ -223,7 +223,11 @@
                 
                 <div class="bug-table py-3" style="position: relative;">
                     <button data-toggle="modal" data-target="#modal" class="btn b-radius-circle box-shadow-off btn-warning py-1 px-1 font-size-18 add-bug-btn">+</button>
-                    
+                    {% if not bug %}
+                    <div class="h-100 w-100 d-flex justify-content-center align-items center">
+                        <span class="font-bold text-success">No Bugs!</span>
+                    </div>
+                    {% endif %}
                     {% for bug in bugs %}
                     <div @click="fetchBug({{bug.pk}})" data-toggle="modal" data-target="#viewModal" class="bug-table-row-container pl-1 pr-2 py-3">
                         <div class="bug-table-row-content">
