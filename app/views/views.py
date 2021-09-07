@@ -50,8 +50,20 @@ class RecordBug(View):
         bug = Bug()
 
         x = request.POST
+
+        try:
+            no = int(Bug.objects.latest('pk').bugCode.split('#')[1])
+            no += 1
+            newCode = "BUG#" + str(no).zfill(4)
+        except: 
+            newCode = "BUG#0000"
         
-        bug.bugCode = x["bugCode"]
+        
+        if Bug.objects.latest('pk').bugCode == x['bugCode']:
+            bug.bugCode = newCode
+        else: 
+            bug.bugCode = x["bugCode"]
+        
         bug.mainFeature = x['mainFeature']
         bug.subFeature = x['subFeature']
         bug.bugTitle = x['bugTitle']
