@@ -4,6 +4,8 @@ from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
 from django.contrib.auth import authenticate, login as auth_login, logout
 from ..models import *
+from rest_framework.views import APIView
+from datetime import datetime
 
 # Create your views here.
 class LoginView(View):
@@ -78,3 +80,33 @@ class RecordBug(View):
         bug.save()
 
         return redirect('/')
+
+class SetDuplicate(APIView):
+    def put(self, request):
+        duplicate = request.data
+
+        sourceBug = Bug.objects.get(pk=duplicate['sourceID'])
+        duplicBug = Bug.objects.get(pk=duplicate['duplicateID'])
+
+        sourceBug.duplicate = duplicBug
+        duplicBug.duplicate = sourceBug
+
+        sourceBug.save()
+        duplicBug.save()
+
+        print(sourceBug.duplicate.bugCode + ' is successfully set as duplicate of ' + sourceBug.bugCode)
+        print(duplicBug.duplicate.bugCode + ' is successfully set as duplicate of ' + duplicBug.bugCode)
+
+        return JsonResponse(0, safe=False)
+
+class SetResolved(APIView):
+    def put(self, request, pk):
+        resolvedBug = Bug.objects.get(pk=pk)
+
+        resolvedBug.status = 'Resolved'
+        resolvedBug.dateResolved = datetime.now()
+        resolvedBug.resolvedBy = request.user
+
+        resolvedBug.save()
+
+        return JsonResponse(0, safe=False)

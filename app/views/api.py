@@ -9,3 +9,8 @@ class BugAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = BugSerializer
     queryset = Bug.objects.all()
+
+class BugNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BugNestedSerializer
+    queryset = Bug.objects.all()

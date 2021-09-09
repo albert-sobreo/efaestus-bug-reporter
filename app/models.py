@@ -16,6 +16,7 @@ class Bug(models.Model):
     resolvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="bugResolvedBy")
     dateFound = models.DateField(null=True, blank=True)
     dateResolved = models.DateField(null=True, blank=True)
+    duplicate = models.ForeignKey('self', related_name='bug', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.bugCode

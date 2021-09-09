@@ -15,3 +15,9 @@ class UserSerializer1(serializers.ModelSerializer):
             'first_name'
             'last_name'
         ]
+
+class BugNestedSerializer(serializers.ModelSerializer):
+    duplicate = BugSerializer(read_only=True)
+    class Meta:
+        model = Bug
+        fields = "__all__"
